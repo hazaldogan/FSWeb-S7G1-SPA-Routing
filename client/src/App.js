@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import axios from "axios";
 
 import KaydedilenlerListesi from "./Filmler/KaydedilenlerListesi";
@@ -7,7 +7,14 @@ import FilmListesi from "./Filmler/FilmListesi";
 import Film from "./Filmler/Film";
 
 export default function App() {
-  const [saved, setSaved] = useState([]); // Stretch: the ids of "saved" movies
+  const [saved, setSaved] = useState([
+    {
+      id: 0,
+      title: "The Godfather",
+      director: "Francis Ford Coppola",
+      metascore: 100,
+    },
+  ]); // Stretch: the ids of "saved" movies
   const [movieList, setMovieList] = useState([]);
 
   useEffect(() => {
@@ -29,21 +36,23 @@ export default function App() {
 
   const KaydedilenlerListesineEkle = (id) => {
     // Burası esnek. Aynı filmin birden fazla kez "saved" e eklenmesini engelleyin
+
+    const varMi = saved.find((film) => film.id === Number(id));
+    if (!varMi) {
+      /* ------ ÖNEMLİ -------- */
+      const kaydedilecekFilm = movieList.find((film) => film.id === Number(id));
+      setSaved([...saved, kaydedilecekFilm]);
+      /*----------------------*/
+    }
   };
 
   return (
     <div>
-      <KaydedilenlerListesi
-        list={
-          [
-            /* Burası esnek */
-          ]
-        }
-      />
+      <KaydedilenlerListesi list={saved} />
 
       <Switch>
         <Route path="/filmler/:id">
-          <Film />
+          <Film KaydedilenlerListesineEkle={KaydedilenlerListesineEkle} />
         </Route>
         <Route path="/">
           <FilmListesi movies={movieList} />
